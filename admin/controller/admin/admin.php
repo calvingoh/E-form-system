@@ -13,6 +13,7 @@ class ControllerAdminAdmin extends Controller {
 		$this->getList();
 	}
 
+	
 	public function add() {
 		$this->load->language('admin/admin');
 
