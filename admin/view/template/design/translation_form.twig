@@ -1,0 +1,214 @@
+{{ header }}{{ column_left }}
+<div id="content">
+  <div class="page-header">
+    <div class="container-fluid">
+      <div class="pull-right">
+        <button type="submit" form="form-translation" data-toggle="tooltip" title="{{ button_save }}" class="btn btn-primary"><i class="fa fa-save"></i></button>
+        <a href="{{ cancel }}" data-toggle="tooltip" title="{{ button_cancel }}" class="btn btn-default"><i class="fa fa-reply"></i></a></div>
+      <h1>{{ heading_title }}</h1>
+      <ul class="breadcrumb">
+        {% for breadcrumb in breadcrumbs %}
+        <li><a href="{{ breadcrumb.href }}">{{ breadcrumb.text }}</a></li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+  <div class="container-fluid">
+    {% if error_warning %}
+    <div class="alert alert-danger alert-dismissible"><i class="fa fa-exclamation-circle"></i> {{ error_warning }}
+      <button type="button" class="close" data-dismiss="alert">&times;</button>
+    </div>
+    {% endif %}
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        <h3 class="panel-title"><i class="fa fa-pencil"></i> {{ text_form }}</h3>
+      </div>
+
+      <div class="panel-body">
+        <form action="{{ action }}" method="post" enctype="multipart/form-data" id="form-translation" class="form-horizontal">
+
+          <div class="form-group">
+            <label class="col-sm-2 control-label" for="input-admin_name">{{ entry_admin_name }}</label>
+            <div class="col-sm-10">
+              <textarea name="value" rows="2" placeholder="{{ entry_admin_name }}" id="input-value" class="form-control">{{ value }}</textarea>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="col-sm-2 control-label" for="input-username">{{ entry_username }}</label>
+            <div class="col-sm-10">
+              <textarea name="value" rows="1" placeholder="{{ entry_username }}" id="input-value" class="form-control">{{ value }}</textarea>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="col-sm-2 control-label" for="input-password">{{ entry_password }}</label>
+            <div class="col-sm-10">
+              <textarea name="value" rows="1" placeholder="{{ entry_password }}" id="input-value" class="form-control">{{ value }}</textarea>
+            </div>
+          </div>
+
+
+          <div class="form-group">
+            <label class="col-sm-2 control-label" for="input-position">{{ entry_position }}</label>
+            <div class="col-sm-10">
+              <select name="entry_position" id="input-position" class="form-control">
+                  {% for position in positions %}
+                  {% if position.position_name == position_positon_name %}
+                  <option value="{{ position.position_name  }}" selected="selected">{{ position.position_name }}</option>
+                  {% else %}
+                  <option value="{{ position.position_name  }}">{{ position.position_name }}</option>
+                  {% endif %}
+                  {% endfor %}
+                </select>
+              {% if error_position %}
+              <div class="text-danger">{{ error_key }}</div>
+              {% endif %}
+            </div>
+          </div>
+          
+          <div class="form-group">
+            <label class="col-sm-2 control-label" for="input-department">{{ entry_department }}</label>
+            <div class="col-sm-10">
+              <select name="entry_department" id="input-department" class="form-control">
+                <option value="0"></option>
+                {% for department in departments %}
+                {% if department.department_id == department_id %}
+                <option value="{{ department.department_id }}" selected="selected">{{ department.name }}</option>
+                {% else %}
+                <option value="{{ department.department_id }}">{{ department.name }}</option>
+                {% endif %}
+                {% endfor %}
+              </select>
+              {% if error_department %}
+              <div class="text-danger">{{ error_department }}</div>
+              {% endif %}
+            </div>
+          </div>
+          
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+  <script type="text/javascript"> //<!--
+    {% if key %}
+    $('select[name="store_id"]').prop('disabled', true);
+    $('select[name="language_id"]').prop('disabled', true);
+    $('select[name="route"]').prop('disabled', true);
+    $('select[name="key"]').prop('disabled', true);
+    $('input[name="key"]').prop('disabled', true);
+    {% else %}
+    $('select[name="language_id"]').on('change', function() {
+      $.ajax({
+        url: 'index.php?route=design/translation/path&user_token={{ user_token }}&language_id=' + $('select[name="language_id"]').val(),
+        dataType: 'json',
+        beforeSend: function() {
+          $('select[name="route"]').html('');
+          $('select[name="key"]').html('');
+          $('input[name="key"]').val('');
+          $('textarea[name="default"]').val('');
+          $('select[name="store_id"]').prop('disabled', true);
+          $('select[name="language_id"]').prop('disabled', true);
+          $('select[name="route"]').prop('disabled', true);
+          $('select[name="key"]').prop('disabled', true);
+          $('input[name="key"]').prop('disabled', true);
+          $('textarea[name="value"]').prop('disabled', true);
+        },
+        complete: function() {
+          $('select[name="store_id"]').prop('disabled', false);
+          $('select[name="language_id"]').prop('disabled', false);
+          $('select[name="route"]').prop('disabled', false);
+        },
+        success: function(json) {
+          html = '<option value=""></option>';
+
+          if (json) {
+            for (i = 0; i < json.length; i++) {
+              if (i == 0) {
+                html += '<option value="' + json[i] + '" selected="selected">' + json[i] + '</option>';
+              } else {
+                html += '<option value="' + json[i] + '">' + json[i] + '</option>';
+              }
+            }
+          }
+
+          $('select[name="route"]').html(html);
+
+          $('select[name="route"]').trigger('change');
+        },
+        error: function(xhr, ajaxOptions, thrownError) {
+          alert(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
+        }
+      });
+    });
+
+    var translation = [];
+
+    $('select[name="route"]').on('change', function() {
+      $.ajax({
+        url: 'index.php?route=design/translation/translation&user_token={{ user_token }}&language_id=' + $('select[name="language_id"]').val() + '&path=' + $('select[name="route"]').val(),
+        dataType: 'json',
+        {% if not key %}
+        beforeSend: function() {
+          $('select[name="key"]').html('');
+          $('input[name="key"]').val('');
+          $('textarea[name="default"]').val('');
+          $('textarea[name="value"]').val('');
+          $('select[name="store_id"]').prop('disabled', true);
+          $('select[name="language_id"]').prop('disabled', true);
+          $('select[name="route"]').prop('disabled', true);
+          $('select[name="key"]').prop('disabled', true);
+          $('textarea[name="value"]').prop('disabled', true);
+        },
+        complete: function() {
+          $('select[name="store_id"]').prop('disabled', false);
+          $('select[name="language_id"]').prop('disabled', false);
+          $('select[name="route"]').prop('disabled', false);
+          $('select[name="key"]').prop('disabled', false);
+          $('textarea[name="value"]').prop('disabled', false);
+        },
+        {% endif %}
+        success: function(json) {
+          translation = [];
+
+          html = '<option value=""></option>';
+
+          if (json) {
+            for (i = 0; i < json.length; i++) {
+              translation[json[i]['key']] = json[i]['value'];
+
+              if (i == 0) {
+                html += '<option value="' + json[i]['key'] + '" selected="selected">' + json[i]['key'] + '</option>';
+              } else {
+                html += '<option value="' + json[i]['key'] + '">' + json[i]['key'] + '</option>';
+              }
+            }
+          }
+
+          $('select[name="key"]').html(html);
+
+          $('select[name="key"]').trigger('change');
+        },
+        error: function(xhr, ajaxOptions, thrownError) {
+          alert(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
+        }
+      });
+    });
+
+    $('select[name="language_id"]').trigger('change');
+
+    $('select[name="key"]').on('change', function() {
+      if ($(this).val()) {
+        $('textarea[name="default"]').val(translation[$('select[name="key"]').val()]);
+        $('input[name="key"]').val($('select[name="key"]').val());
+
+        $('input[name="key"]').prop('disabled', true);
+      } else {
+        $('textarea[name="default"]').val('');
+
+        $('input[name="key"]').prop('disabled', false);
+      }
+    });
+    {% endif %}
+  //--></script> 
+</div>
+{{ footer }} 

@@ -1,0 +1,342 @@
+{{ header }}{{ column_left }}{{ scripts }}
+<div id="content">
+  <div class="page-header">
+    <div class="container-fluid">
+      <div class="pull-right">
+        <button type="button" data-toggle="tooltip" title="{{ button_save }}" class="btn btn-primary"><i class="fa fa-save" onclick="submitForm()"></i></button>
+        <a href="{{ cancel }}" data-toggle="tooltip" title="{{ button_cancel }}" class="btn btn-default"><i class="fa fa-reply"></i></a></div>
+      <h1>{{ heading_title }}</h1>
+      <ul class="breadcrumb">
+        {% for breadcrumb in breadcrumbs %}
+        <li><a href="{{ breadcrumb.href }}">{{ breadcrumb.text }}</a></li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+  <div class="container-fluid">
+    {% if error_warning %}
+    <div class="alert alert-danger alert-dismissible"><i class="fa fa-exclamation-circle"></i> {{ error_warning }}
+      <button type="button" class="close" data-dismiss="alert">&times;</button>
+    </div>
+    {% endif %}
+
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        <h3 class="panel-title"><i class="fa fa-pencil"></i> {{ text_form }}</h3>
+      </div>
+
+      <form action="{{ action }}" method="post" enctype="multipart/form-data" id="form-eform" class="form-horizontal">
+
+      <div class="form-group ">
+        <label class="col-sm-2 control-label" for="input-eform_name">{{ entry_eform_name }}</label>
+        <div class="col-sm-10">
+          <input type="text" name="eform_name" value="{{ eform_name }}" placeholder="{{ entry_eform_name }}" id="input-eform_name" class="form-control" />
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="col-sm-2 control-label" for="input-department_id">{{ entry_department }}</label>
+        <div class="col-sm-10">
+          <select name="department_id" id="input-department_id" class="form-control">
+            {% for department in departments %}
+            {% if department.department_id == department_id %}
+            <option value="{{ department.department_id }}" selected="selected">{{ department.department_name }}</option>
+            {% else %}
+            <option value="{{ department.department_id }}">{{ department.department_name }}</option>
+            {% endif %}
+            {% endfor %}
+          </select>
+        </div>
+      </div>
+
+<div class="form-group ">
+  <label class="col-sm-2 control-label" for="input-status">{{ entry_status }}</label>
+  <div class="col-sm-10">
+    <select name="status" id="input-status" class="form-control">
+      {% if status %}
+      <option value="0">{{ text_disabled }}</option>
+      <option value="1" selected="selected">{{ text_enabled }}</option>
+      {% else %}
+      <option value="0" selected="selected">{{ text_disabled }}</option>
+      <option value="1">{{ text_enabled }}</option>
+      {% endif %}
+    </select>
+  </div>
+</div>
+
+<div class="form-group">
+  <label class="col-sm-2 control-label" for="input-approve"> Approval</label>
+  
+<div class="col-sm-10">
+  <div class="ui-widget">
+    <span class="help-block">Hold Control Button To Select More Than One </span> 
+  <div class="col-sm-4 " style="padding-left:0;">
+    <button class='btn btn-success' type='button' onclick='addLevel()'><i class='fa fa-plus'></i></button> 
+      <select name='approve[]' multiple id='approve' class='form-control' onchange='select(this.value)'>
+        {% for admin in admin %}
+          <option value="{{admin.firstname}}">{{admin.firstname}}</option>
+        {% endfor %}
+        {% for staff in staff %}
+          <option value="{{staff.staff_name}}">{{staff.staff_name}}</option>
+        {% endfor %}
+      </select>
+      </div>
+  </div>
+  <div class='col-sm-6' id='levelGroup'>
+    <div class='col'>
+      <label><input type='radio' id='lvlid1'  value=1 name='level' checked> Level 1 : </label>
+      <div id='level1'></div>
+    </div>
+    
+  </div>
+  <div class="testing"></div>
+</div>
+</div>
+
+
+
+<!-- <div class="form-group">
+  <label class="col-sm-2 control-label" for="input-level">Level</label>
+  <div class="col-sm-10">
+    <div class="ui-widget">
+      <div class="col-sm-4" style="padding-left:0;">
+      <input id="level" class="form-control ui-autocomplete-input" autocomplete="off">
+      <input type="hidden" id="nval" value>
+    </div>
+    <input type="button" id="plus" onclick="addLevel()" value="+" class="btn btn-success">
+  </div>
+  <p></p>
+    <br></br>
+  </div>
+</div> -->
+
+
+
+
+<input type="hidden" id="form_id" value>
+<div class="errorFormat"></div>
+<div id="test" class="build-wrap"></div>
+<form class="render_wrap"></form>
+<div class="fb-render"></div>
+
+  <script>
+    var replaceField = [
+      {
+        type: 'autocomplete',
+        label: 'Autocomplete',
+        required: true,
+      },
+      {
+        type: 'button',
+        label: 'Button',
+      },
+      {
+        type: 'checkbox-group',
+        label: 'Checkbox Group',
+        required: true,
+      },
+      {
+        type: 'date',
+        label: 'Date Field',
+        required: true,
+      },
+      {
+        type: 'file-upload',
+        label: 'File Upload',
+        required: true,
+      },
+      {
+        type: 'header',
+        label: 'Header',
+      },
+      {
+        type: 'hidden-input',
+        label: 'Hidden Input',
+      },
+      {
+        type: 'paragraph',
+        label: 'Paragraph',
+      },
+      {
+        type: 'number',
+        label: 'Number',
+        required: true,
+      },
+      {
+        type: 'radio-group',
+        label: 'Radio Group',
+        required: true,
+      },
+      {
+        type: 'select',
+        label: 'Select',
+        required: true,
+      },
+      {
+        type: 'text-field',
+        label: 'Text Field',
+        required: true,
+      },
+      {
+        type: 'text-area',
+        label: 'Text Area',
+        required: true,
+      }
+    ]
+    var options = {
+      disableFields:['autocomplete','button','file','hidden','paragraph'],
+      disabledActionButtons: ['data','save']
+    };
+    var eform_format = '{{format}}';
+    var formBuilder = $('#test').formBuilder(options,{replaceField});
+    setTimeout(function(){ formBuilder.actions.setData(eform_format); }, 500);
+
+    function submitForm(){
+      // return false;
+      var eform_name = $('#input-eform_name').val();
+      var status = $('#input-status').val();
+      var department_id = $('#input-department_id').val();
+      var form_name = $('#input-eform_name').val();
+      var approve = $('#approve').val();
+      var reject = $('#reject').val();
+      var remarks = $('#input-remarks').val();
+      // var mail_to = $('#mail_to').val;
+      // var mail_from = $('#mail_from').val;
+      // var subject = $('#subject').val;
+      // var body = $('#body').val;
+      var eform_format = [];
+
+      eform_format = formBuilder.actions.getData();
+      eform_format = JSON.stringify(eform_format);
+      alert(eform_format);
+         $.ajax({
+           dataType:'json',
+           type:'post',
+           data : 'eform_name=' + eform_name + '&eform_format=' + eform_format + '&status=' + status + '&department_id=' + department_id + '&approve='+ approve + '&reject=' + reject + '&remarks' + remarks,
+           success: function(){
+             window.location.href('index.php?route=eform/eform&user_token={{user_token}}');
+           }  
+         });
+        }
+      // var counter = 0;
+      // var temp;
+      // var temp2;
+      // var array=[];
+
+      // function addLevel(){
+      //   if(($('#level').val())==""){
+      //     alert("Invalid Input");
+      //   }
+      //   else
+      //     temp2 = $('#level').val();
+      //     temp = $('#nval').val();
+
+      //     array[counter] = {id:temp, name:temp2, level:conter};
+      //     counter ++;
+      //     $('#level').val("");
+      //     $('#nval').val("");
+
+      // }
+       var lvlcount=1;
+        function addLevel(){
+          var lvlDiv=document.createElement('div');
+          lvlcount++;
+          lvlDiv.id='lvlcheck'+lvlcount;
+          lvlDiv.className='col';
+
+          var label=document.createElement('label');
+          
+          var txt=document.createTextNode(' Level '+lvlcount+' :');
+          
+
+          var radio = document.createElement('input');
+          radio.type='radio';
+          radio.value=lvlcount;
+          radio.name='level';
+          radio.id='lvlid'+lvlcount;
+          label.appendChild(radio);
+          label.appendChild(txt);
+
+          var lvlContent=document.createElement('div');
+          lvlContent.id='level'+lvlcount;
+
+          document.getElementById('levelGroup').appendChild(lvlDiv);
+          document.getElementById(lvlDiv.id).appendChild(label);
+          document.getElementById(lvlDiv.id).appendChild(lvlContent);
+        }
+        var val=Array();
+        function select(value){
+          var select=$('#approve').val();
+          var deleted;
+          if(select==undefined || select==null){
+            for(i=1;i<=lvlcount;i++){
+              document.getElementById('level'+i).innerHTML="";
+            }
+            val.splice(0,val.length);
+          }
+          else{
+              if(select.length<val.length){
+              for(i=0;i<val.length;i++){
+                var match=false;
+                for(x=0;x<select.length;x++){
+                  if(val[i]==select[x]){
+                    match=true;
+                    break;
+                  }
+                }
+                if(match==false){
+                  deleted=val[i];
+                  val.splice(i,1);
+                  for(y=1;y<=lvlcount;y++){
+                    if(document.getElementById('level'+y).innerHTML.includes(','+deleted)){
+                      
+                      document.getElementById('level'+y).innerHTML=document.getElementById('level'+y).innerHTML.replace(','+deleted,'');
+                    
+                    } 
+                    else if(document.getElementById('level'+y).innerHTML.includes(deleted)){
+                      if(document.getElementById('level'+y).innerHTML.indexOf(deleted)==0){
+                        document.getElementById('level'+y).innerHTML=document.getElementById('level'+y).innerHTML.replace(deleted+',','');
+                        document.getElementById('level'+y).innerHTML=document.getElementById('level'+y).innerHTML.replace(deleted,'');
+                      }
+                      else{
+                        document.getElementById('level'+y).innerHTML=document.getElementById('level'+y).innerHTML.replace(deleted,'');
+                      }
+                      
+                      
+                    }
+                  }
+                  
+                }
+              }
+            }
+            else{
+                for(i=0;i<select.length;i++){
+                var same=false;
+                for(x=0;x<val.length;x++){
+                  if(select[i]==val[x]){
+                    same=true;
+                    break;
+                  }
+                }
+                if(!same){
+                  val.push(select[i]);
+                  var index= $("input[name='level']:checked").val();
+                  var content=document.getElementById('level'+index);
+                  if(content.innerHTML.length==0){
+                    content.innerHTML+=select[i];
+                  }
+                  else{
+                    content.innerHTML+=','+select[i];
+                  }
+                }
+              }
+            }
+          }
+          
+          
+           
+           console.log(val);
+        }
+    </script>
+     
+   

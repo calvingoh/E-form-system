@@ -1,0 +1,111 @@
+{{ header }}
+<div id="content">
+  <div class="page-header">
+    <div class="container-fluid">
+      <div class="pull-right">
+        <button type="button" form="form-eform" data-toggle="tooltip" title="{{ button_save }}" class="btn btn-primary"><i class="fa fa-save" onclick="submitForm();"></i></button>
+        <a href="{{ cancel }}" data-toggle="tooltip" title="{{ button_cancel }}" class="btn btn-default"><i class="fa fa-reply"></i></a></div>
+      <h1>{{ heading_title }}</h1>
+      <ul class="breadcrumb">
+        {% for breadcrumb in breadcrumbs %}
+        <li><a href="{{ breadcrumb.href }}">{{ breadcrumb.text }}</a></li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+  <div class="container-fluid">
+    {% if error_warning %}
+    <div class="alert alert-danger alert-dismissible"><i class="fa fa-exclamation-circle"></i> {{ error_warning }}
+      <button type="button" class="close" data-dismiss="alert">&times;</button>
+    </div>
+    {% endif %}
+
+
+<div class="container container">
+  <div class="panel panel-default">
+    <div class="panel-heading">
+      <div id="test" class="build-wrap"></div>
+        <form id="fb-render"></form>
+    <script> 
+        jQuery(function($) {
+          formData = JSON.stringify(temp)
+          var fbRender = document.getElementById('fb-render');
+        
+         var temp = '{{temp}}';
+         //alert(temp);
+        
+        var formRenderOpts = {
+          formData: temp,
+          dataType:'json'
+        };
+          $(fbRender).formRender(formRenderOpts);  
+        });
+      
+         
+      function submitForm(){
+            getUserDataBtn = document.getElementById("get-user-data");
+            var eform_id = $('#formId').val();
+            var eform_name = $('#input-eform_name').val();
+            var status = $('#status').val();
+            var staff_id = $('#staff_id').val();
+            var department = $('#department').val();
+            var reply_id = $('#reply_id').val();
+            var approve = $('#approve').val();
+            var reject = $('#reject').val();
+            
+            var o={};
+            var a=$(".rendered-form :input").serializeArray();
+            $.each(a, function () {
+                if (o[this.name] !== undefined) {
+                    if (!o[this.name].push) {
+                        o[this.name] = [o[this.name]];
+                    }
+                    o[this.name].push(this.value || '');
+                } else {
+                    o[this.name] = this.value || '';
+                }
+            });
+            var userData = JSON.stringify(o);
+            // alert(userData);
+            /*$.ajax({
+              type: "POST",
+              data: 'form_input=' + userData + '&eform_id=' + eform_id + '&eform_name' + eform_name,
+              success: function(json){
+                window.location.href ="index.php?route=eform/eform_enabled/add&user_token={{user_token}}";
+              }
+            });*/
+            var id={{eform_id}};
+            var params={'form_input':userData,'eform_id':id,'eform_name':eform_name, 'staff_id':staff_id, 'reply_id':reply_id, 'department':department, 'status':status, 'approve':approve, 'reject':reject};
+            post('index.php?route=account/eform_form/index&',params,'post');
+            alert("Form Successfully Submitted");
+          }
+          
+      function post(path, params, method='post') {
+      
+      // The rest of this code assumes you are not using a library.
+      // It can be made less wordy if you use one.
+      const form = document.createElement('form');
+      form.method = method;
+      form.action = path;
+      
+      for (const key in params) {
+        if (params.hasOwnProperty(key)) {
+          const hiddenField = document.createElement('input');
+          hiddenField.type = 'hidden';
+          hiddenField.name = key;
+          hiddenField.value = params[key];
+      
+          form.appendChild(hiddenField);
+        }
+      }
+      
+      document.body.appendChild(form);
+      form.submit();
+      }
+          </script>
+    </div>
+  </div>
+</div>
+
+
+     
